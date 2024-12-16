@@ -1,0 +1,27 @@
+@page "/persons/create"
+@using CaminoManager.Data.Models
+@using CaminoManager.Web.Services
+@inject PersonService PersonService
+@inject NavigationManager NavigationManager
+
+<MudText Typo="Typo.h3" Class="mb-4">Create Person</MudText>
+
+<PersonForm Person="_person"
+           ButtonText="Create"
+           OnValidSubmit="CreatePerson"
+           OnCancel="Cancel" />
+
+@code {
+    private Person _person = new();
+
+    private async Task CreatePerson()
+    {
+        await PersonService.CreatePersonAsync(_person);
+        NavigationManager.NavigateTo("/people");
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/people");
+    }
+} 

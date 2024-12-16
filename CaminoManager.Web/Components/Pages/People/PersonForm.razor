@@ -1,0 +1,63 @@
+@using CaminoManager.Data.Models
+@using System.ComponentModel.DataAnnotations
+@inject ILogger<PersonForm> Logger
+
+<EditForm Model="Person" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <MudCard>
+        <MudCardContent>
+            <MudTextField @bind-Value="Person.PersonName" 
+                         Label="Name" 
+                         Required="true" />
+                         
+            <MudTextField @bind-Value="Person.Phone" 
+                         Label="Phone"
+                         Pattern="[0-9\-\+]+" />
+                         
+            <MudTextField @bind-Value="Person.Mobile" 
+                         Label="Mobile"
+                         Pattern="[0-9\-\+]+" />
+                         
+            <MudTextField @bind-Value="Person.Email" 
+                         Label="Email" 
+                         Required="true" />
+                         
+            <MudSelect T="PersonType" @bind-Value="Person.PersonTypeId"
+                      Label="Person Type"
+                      Required="true">
+                @foreach (var type in Enum.GetValues(typeof(PersonType)))
+                {
+                    <MudSelectItem Value="@((PersonType)type)">@type</MudSelectItem>
+                }
+            </MudSelect>
+            
+            <MudSelect T="GenderType" @bind-Value="Person.GenderId"
+                      Label="Gender"
+                      Required="true">
+                @foreach (var gender in Enum.GetValues(typeof(GenderType)))
+                {
+                    <MudSelectItem Value="@((GenderType)gender)">@gender</MudSelectItem>
+                }
+            </MudSelect>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" 
+                      Color="Color.Primary" 
+                      Variant="Variant.Filled">@ButtonText</MudButton>
+            <MudButton OnClick="OnCancel" 
+                      Color="Color.Secondary" 
+                      Variant="Variant.Filled">Cancel</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@code {
+    [Parameter] public Person Person { get; set; } = new();
+    [Parameter] public string ButtonText { get; set; } = "Save";
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private void Submit() => Logger.LogInformation("Id = {Id}", Person?.Id);
+} 

@@ -1,0 +1,66 @@
+@page "/people"
+@using CaminoManager.Data.Models
+@using CaminoManager.Web.Services
+@inject PersonService PersonService
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+
+<PageTitle>People</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">People</MudText>
+
+<MudButton StartIcon="@Icons.Material.Filled.People" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => NavigationManager.NavigateTo("/people/create"))" Class="mb-4">
+    Add Person
+</MudButton>
+
+@if (_people == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="_people" T="Person" Dense="true" Hover="true" Bordered="true" Striped="true" >
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.PersonName</MudTd>
+            <MudTd>@context.Email</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" 
+                             OnClick="@(e => NavigationManager.NavigateTo($"/people/edit/{context.Id}"))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                             OnClick="@(async e => await DeletePerson(context))" />
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSize="10" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private List<Person>? _people;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _people = await PersonService.GetPersonsAsync();
+    }
+
+    private async Task DeletePerson(Person person)
+    {
+        var result = await DialogService.ShowMessageBox(
+            "Delete Person",
+            "Are you sure you want to delete this person?",
+            yesText: "Delete",
+            cancelText: "Cancel");
+
+        if (result == true)
+        {
+            await PersonService.DeletePersonAsync(person.Id);
+            _people = await PersonService.GetPersonsAsync();
+        }
+    }
+} 

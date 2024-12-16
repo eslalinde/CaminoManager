@@ -1,0 +1,43 @@
+@page "/persons/edit/{Id:guid}"
+@using CaminoManager.Data.Models
+@using CaminoManager.Web.Services
+@inject PersonService PersonService
+@inject NavigationManager NavigationManager
+
+<MudText Typo="Typo.h3" Class="mb-4">Edit Person</MudText>
+
+@if (_person == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <PersonForm Person="_person"
+               ButtonText="Update"
+               OnValidSubmit="UpdatePerson"
+               OnCancel="Cancel" />
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private Person? _person;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _person = await PersonService.GetPersonAsync(Id);
+    }
+
+    private async Task UpdatePerson()
+    {
+        if (_person != null)
+        {
+            await PersonService.UpdatePersonAsync(_person);
+            NavigationManager.NavigateTo("/people");
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/people");
+    }
+} 
