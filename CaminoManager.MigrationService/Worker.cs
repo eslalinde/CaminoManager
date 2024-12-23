@@ -1,10 +1,10 @@
 using CaminoManager.Data.Contexts;
+using CaminoManager.Data.Seeders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using OpenTelemetry.Trace;
 using System.Diagnostics;
-using CaminoManager.Data.Seeders;
 
 namespace CaminoManager.MigrationService;
 

@@ -10,4 +10,4 @@ public partial class CityMapper
     public partial CityDto ToDto(City city);
     public partial City ToEntity(CreateCityDto dto);
     public partial void UpdateEntity(UpdateCityDto dto, City entity);
-} 
+}

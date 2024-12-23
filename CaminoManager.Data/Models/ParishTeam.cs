@@ -1,5 +1,3 @@
-using System;
-
 namespace CaminoManager.Data.Models;
 
 public class ParishTeam

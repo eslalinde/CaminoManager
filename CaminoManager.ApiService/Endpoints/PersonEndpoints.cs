@@ -1,8 +1,8 @@
+using CaminoManager.ApiService.Mappers;
 using CaminoManager.Data.Contexts;
 using CaminoManager.Data.Models;
-using Microsoft.EntityFrameworkCore;
 using CaminoManager.ServiceDefaults.DTOs;
-using CaminoManager.ApiService.Mappers;
+using Microsoft.EntityFrameworkCore;
 
 namespace CaminoManager.ApiService.Endpoints;
 
@@ -67,4 +67,4 @@ public static class PersonEndpoints
 
         return app;
     }
-} 
+}

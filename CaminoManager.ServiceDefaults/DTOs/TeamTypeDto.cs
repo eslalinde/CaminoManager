@@ -1,4 +1,4 @@
-namespace CaminoManager.ServiceDefaults.Dtos;
+namespace CaminoManager.ServiceDefaults.DTOs;
 
 public class TeamTypeDto
 {
@@ -17,4 +17,4 @@ public class UpdateTeamTypeDto
 {
     public string Name { get; set; } = string.Empty;
     public int Order { get; set; }
-} 
+}

@@ -1,7 +1,6 @@
 using CaminoManager.ApiService.Endpoints;
 using CaminoManager.Data.Contexts;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 

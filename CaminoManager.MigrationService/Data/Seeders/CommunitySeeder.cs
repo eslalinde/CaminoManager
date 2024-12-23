@@ -14,7 +14,7 @@ public static class CommunitySeeder
 
         // Get all existing people
         var allPeople = await dbContext.People.ToListAsync(cancellationToken);
-        
+
         // Group married couples
         var marriedPeople = allPeople.Where(p => p.PersonTypeId == PersonType.Married)
                                    .GroupBy(p => p.Spouse?.Id)
@@ -24,8 +24,8 @@ public static class CommunitySeeder
 
         var priests = allPeople.Where(p => p.PersonTypeId == PersonType.Priest).ToList();
         var seminarians = allPeople.Where(p => p.PersonTypeId == PersonType.Seminarian).ToList();
-        var otherSingles = allPeople.Where(p => p.PersonTypeId != PersonType.Married 
-                                            && p.PersonTypeId != PersonType.Priest 
+        var otherSingles = allPeople.Where(p => p.PersonTypeId != PersonType.Married
+                                            && p.PersonTypeId != PersonType.Priest
                                             && p.PersonTypeId != PersonType.Seminarian)
                                    .ToList();
 
@@ -47,19 +47,19 @@ public static class CommunitySeeder
         for (int i = 0; i < 3; i++)
         {
             var community = communityFaker.Generate();
-            
+
             // Assign 10 married couples (20 people)
             var selectedMarriedCouples = marriedPeople.Skip(i * 10).Take(10).SelectMany(x => x).ToList();
-            
+
             // Assign 1 priest
             var selectedPriest = priests[i];
-            
+
             // Assign 2 seminarians
             var selectedSeminarians = seminarians.Skip(i * 2).Take(2).ToList();
-            
+
             // Calculate how many more people we need (should be 7)
             var remainingCount = 30 - (selectedMarriedCouples.Count + 1 + 2);
-            
+
             // Select random other singles
             var selectedOtherSingles = otherSingles
                 .Skip(i * remainingCount)
@@ -85,11 +85,11 @@ public static class CommunitySeeder
 
             community.BornBrothers = 30;
             community.ActualBrothers = 30;
-            
+
             communities.Add(community);
         }
 
         await dbContext.Communities.AddRangeAsync(communities, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
-} 
+}

@@ -1,5 +1,4 @@
 using CaminoManager.Data.Models;
-using System.Net.Http.Json;
 
 namespace CaminoManager.Web.Services;
 
@@ -31,4 +30,4 @@ public class PersonService : BaseApiService
     {
         await DeleteAsync($"people/{id}");
     }
-} 
+}

@@ -1,6 +1,5 @@
 using CaminoManager.ApiService.Mappers;
 using CaminoManager.Data.Contexts;
-using CaminoManager.Data.Models;
 using CaminoManager.ServiceDefaults.Dtos;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,4 +55,4 @@ public static class CityEndpoints
 
         return group;
     }
-} 
+}

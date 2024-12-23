@@ -30,4 +30,4 @@ public class CommunityService : BaseApiService
     {
         await DeleteAsync($"communities/{id}");
     }
-} 
+}

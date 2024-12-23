@@ -8,9 +8,9 @@ namespace CaminoManager.ApiService.Mappers;
 public partial class CountryMapper
 {
     public partial CountryDto ToDto(Country entity);
-    
+
     public partial Country ToEntity(CreateCountryDto dto);
-    
+
     [MapperIgnoreTarget(nameof(Country.Id))]
     public partial void UpdateEntity(UpdateCountryDto dto, Country entity);
-} 
+}

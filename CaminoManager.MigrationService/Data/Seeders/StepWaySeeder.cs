@@ -38,4 +38,4 @@ public static class StepWaySeeder
             await dbContext.SaveChangesAsync(cancellationToken);
         }
     }
-} 
+}

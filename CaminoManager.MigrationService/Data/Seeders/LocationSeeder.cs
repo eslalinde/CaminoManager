@@ -81,4 +81,4 @@ public static class LocationSeeder
             await dbContext.SaveChangesAsync(cancellationToken);
         }
     }
-} 
+}

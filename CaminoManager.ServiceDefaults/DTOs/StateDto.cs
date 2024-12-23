@@ -1,4 +1,4 @@
-namespace CaminoManager.ServiceDefaults.Dtos;
+namespace CaminoManager.ServiceDefaults.DTOs;
 
 public class StateDto
 {
@@ -17,4 +17,4 @@ public class UpdateStateDto
 {
     public string Name { get; set; } = null!;
     public Guid CountryId { get; set; }
-} 
+}

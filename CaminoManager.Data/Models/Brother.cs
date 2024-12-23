@@ -1,7 +1,3 @@
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-
 namespace CaminoManager.Data.Models;
 
 public class Brother
