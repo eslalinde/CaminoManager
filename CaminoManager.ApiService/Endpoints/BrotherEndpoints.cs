@@ -8,7 +8,7 @@ public static class BrotherEndpoints
 {
     public static IEndpointRouteBuilder MapBrotherEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/brothers");
+        var group = app.MapGroup("/brothers").WithTags("Brothers");
 
         // GET all brothers
         group.MapGet("/", async (CaminoManagerDbContext db) =>

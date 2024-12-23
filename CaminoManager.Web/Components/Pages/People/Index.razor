@@ -4,6 +4,7 @@
 @inject PersonService PersonService
 @inject NavigationManager NavigationManager
 @inject IDialogService DialogService
+@rendermode InteractiveServer
 
 <PageTitle>People</PageTitle>
 
@@ -19,30 +20,65 @@
 }
 else
 {
-    <MudTable Items="_people" T="Person" Dense="true" Hover="true" Bordered="true" Striped="true" >
-        <HeaderContent>
-            <MudTh>Name</MudTh>
-            <MudTh>Email</MudTh>
-            <MudTh>Actions</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd>@context.PersonName</MudTd>
-            <MudTd>@context.Email</MudTd>
-            <MudTd>
-                <MudIconButton Icon="@Icons.Material.Filled.Edit" 
-                             OnClick="@(e => NavigationManager.NavigateTo($"/people/edit/{context.Id}"))" />
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" 
-                             OnClick="@(async e => await DeletePerson(context))" />
-            </MudTd>
-        </RowTemplate>
+    <MudDataGrid Items="_people" T="Person" Dense="true" Hover="true" Bordered="true" Striped="true" QuickFilter="@_quickFilter"
+                 EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual"
+                 FilterMode="@DataGridFilterMode.Simple" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.Default">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">People</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.PersonName" />
+            <PropertyColumn Property="x => x.Phone" />
+            <PropertyColumn Property="x => x.Mobile" />
+            <PropertyColumn Property="x => x.Email" />
+            <PropertyColumn Property="x => x.GenderId" Title="Gender">
+                <EditTemplate>
+                    <MudSelect T="GenderType" @bind-Value="context.Item.GenderId"
+                               Label="Gender"
+                               Required="true"
+                               RequiredError="You must select a Gender!!!"
+                               Margin="@Margin.Dense">
+                        @foreach (var gender in Enum.GetValues(typeof(GenderType)))
+                        {
+                            <MudSelectItem Value="@((GenderType)gender)">@gender</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.PersonTypeId" Title="Person Type">
+                <EditTemplate>
+                    <MudSelect T="PersonType" @bind-Value="context.Item.PersonTypeId"
+                               Label="Person Type"
+                               Required="true"
+                               RequiredError="You must select a Person type!!!"
+                               Margin="@Margin.Dense">
+                        @foreach (var type in Enum.GetValues(typeof(PersonType)))
+                        {
+                            <MudSelectItem Value="@((PersonType)type)">@type</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@(() => NavigationManager.NavigateTo($"/people/edit/${context.Item.Id}"))" />
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@(async e => await DeletePerson(context.Item))" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
         <PagerContent>
-            <MudTablePager PageSize="10" />
+            <MudDataGridPager T="Person" />
         </PagerContent>
-    </MudTable>
+    </MudDataGrid>
 }
 
 @code {
     private List<Person>? _people;
+    private string _searchString;
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,4 +99,18 @@ else
             _people = await PersonService.GetPersonsAsync();
         }
     }
+
+    private Func<Person, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.PersonName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Mobile.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
 } 

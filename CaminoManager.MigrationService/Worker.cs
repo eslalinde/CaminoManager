@@ -68,7 +68,11 @@ public class Worker(
     private static async Task SeedDataAsync(CaminoManagerDbContext dbContext, CancellationToken cancellationToken)
     {
         using var activity = s_activitySource.StartActivity("Seeding data");
+        await LocationSeeder.SeedLocationsAsync(dbContext, cancellationToken);
+        await StepWaySeeder.SeedStepWaysAsync(dbContext, cancellationToken);
+        await ParishSeeder.SeedParishesAsync(dbContext, cancellationToken);
         await PersonSeeder.SeedPeopleAsync(dbContext, cancellationToken);
         await CommunitySeeder.SeedCommunitiesAsync(dbContext, cancellationToken);
+        await TeamTypeSeeder.SeedTeamTypesAsync(dbContext, cancellationToken);
     }
 }

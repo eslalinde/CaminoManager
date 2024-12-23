@@ -1,16 +1,6 @@
-using CaminoManager.ApiService.DTOs;
-using CaminoManager.ApiService.Endpoints;
-using CaminoManager.ApiService.Mappers;
-using CaminoManager.Data.Contexts;
-using CaminoManager.Data.Models;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
-using Moq;
-using System.Linq.Expressions;
-using System.Text.Json;
-using System.Net;
+using CaminoManager.ServiceDefaults.DTOs;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace CaminoManager.Tests;
 
@@ -29,7 +19,7 @@ public class PersonEndpointsTests : IClassFixture<TestFixture>
         // Act
         var response = await _httpClient.GetAsync("/people");
         var content = await response.Content.ReadAsStringAsync();
-        var people = JsonSerializer.Deserialize<List<PersonDto>>(content, 
+        var people = JsonSerializer.Deserialize<List<PersonDto>>(content,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         // Assert
@@ -49,7 +39,7 @@ public class PersonEndpointsTests : IClassFixture<TestFixture>
 
         var createResponse = await _httpClient.PostAsJsonAsync("/people", newPerson);
         var createdPerson = await createResponse.Content.ReadFromJsonAsync<PersonDto>();
-        
+
         // Act
         var response = await _httpClient.GetAsync($"/people/{createdPerson.Id}");
         var person = await response.Content.ReadFromJsonAsync<PersonDetailDto>();

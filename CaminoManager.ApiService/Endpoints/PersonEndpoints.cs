@@ -1,7 +1,7 @@
 using CaminoManager.Data.Contexts;
 using CaminoManager.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using CaminoManager.ApiService.DTOs;
+using CaminoManager.ServiceDefaults.DTOs;
 using CaminoManager.ApiService.Mappers;
 
 namespace CaminoManager.ApiService.Endpoints;
@@ -10,7 +10,7 @@ public static class PersonEndpoints
 {
     public static IEndpointRouteBuilder MapPersonEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/people");
+        var group = app.MapGroup("/people").WithTags("People");
         var mapper = new PersonMapper();
 
         // GET all persons
