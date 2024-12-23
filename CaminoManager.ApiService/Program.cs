@@ -52,6 +52,12 @@ if (app.Environment.IsDevelopment())
 app.MapPersonEndpoints();
 app.MapCommunityEndpoints();
 app.MapBrotherEndpoints();
+app.MapCountryEndpoints();
+app.MapStateEndpoints();
+app.MapCityEndpoints();
+app.MapTeamTypeEndpoints();
+app.MapParishEndpoints();
+app.MapStepWayEndpoints();
 
 app.MapDefaultEndpoints();
 

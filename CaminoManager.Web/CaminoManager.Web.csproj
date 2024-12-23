@@ -15,4 +15,8 @@
     <PackageReference Include="MudBlazor" Version="7.15.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Components\Pages\Communities\" />
+  </ItemGroup>
+
 </Project>

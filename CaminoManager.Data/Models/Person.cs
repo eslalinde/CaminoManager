@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using NpgsqlTypes;
 
 namespace CaminoManager.Data.Models;
 
@@ -18,4 +19,7 @@ public class Person
     // Navigation properties
     public virtual Person? Spouse { get; set; }
     public virtual ICollection<Brother> Brothers { get; set; } = new List<Brother>();
+
+    // Add this property for full-text search
+    public NpgsqlTsVector? SearchVector { get; set; }
 }

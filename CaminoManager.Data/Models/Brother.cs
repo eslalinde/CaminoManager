@@ -12,4 +12,5 @@ public class Brother
     // Navigation properties
     public virtual Person Person { get; set; } = null!;
     public virtual Community Community { get; set; } = null!;
+    public virtual ICollection<Belong> Belongs { get; set; } = new List<Belong>();
 }

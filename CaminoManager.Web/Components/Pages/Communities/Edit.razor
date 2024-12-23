@@ -1,0 +1,59 @@
+@page "/communities/edit/{Id:guid}"
+@using CaminoManager.ServiceDefaults.DTOs
+@using CaminoManager.Web.Services
+@inject CommunityService CommunityService
+@inject NavigationManager NavigationManager
+
+<MudText Typo="Typo.h3" Class="mb-4">Edit Community</MudText>
+
+@if (_community == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <CommunityForm Community="_community"
+                   ButtonText="Update"
+                   OnValidSubmit="UpdateCommunity"
+                   OnCancel="Cancel" />
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private UpdateCommunityDto? _community;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var dto = await CommunityService.GetCommunityAsync(Id);
+        if (dto != null)
+        {
+            _community = new UpdateCommunityDto
+            {
+                Id = dto.Id,
+                Number = dto.Number,
+                BornDate = dto.BornDate,
+                ParishId = dto.ParishId,
+                BornBrothers = dto.BornBrothers,
+                ActualBrothers = dto.ActualBrothers,
+                StepWayId = dto.StepWayId,
+                StepWayDate = dto.StepWayDate,
+                CatechistTeamId = dto.CatechistTeamId,
+                OldCatechist = dto.OldCatechist
+            };
+        }
+    }
+
+    private async Task UpdateCommunity()
+    {
+        if (_community != null)
+        {
+            await CommunityService.UpdateCommunityAsync(_community);
+            NavigationManager.NavigateTo("/communities");
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/communities");
+    }
+}

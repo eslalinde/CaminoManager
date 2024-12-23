@@ -1,6 +1,4 @@
-using Riok.Mapperly.Abstractions;
-
-namespace CaminoManager.ApiService.DTOs;
+namespace CaminoManager.ServiceDefaults.DTOs;
 
 public class PersonDto
 {
@@ -10,14 +8,12 @@ public class PersonDto
     public string Mobile { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public int PersonTypeId { get; set; }
-    [MapperIgnore]
     public string PersonTypeName { get; set; } = string.Empty;
     public int GenderId { get; set; }
-    [MapperIgnore]
     public string GenderName { get; set; } = string.Empty;
 }
 
 public class PersonDetailDto : PersonDto
 {
     public Guid? SpouseId { get; set; }
-} 
+}

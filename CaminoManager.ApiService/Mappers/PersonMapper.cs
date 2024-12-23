@@ -1,5 +1,5 @@
-using CaminoManager.ApiService.DTOs;
 using CaminoManager.Data.Models;
+using CaminoManager.ServiceDefaults.DTOs;
 using Riok.Mapperly.Abstractions;
 
 namespace CaminoManager.ApiService.Mappers;
@@ -15,4 +15,4 @@ public partial class PersonMapper
 
     //private string MapPersonTypeName(PersonType personType) => personType.ToString();
     //private string MapGenderName(GenderType gender) => gender.ToString();
-} 
+}

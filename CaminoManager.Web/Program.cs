@@ -1,4 +1,3 @@
-using CaminoManager.Web;
 using CaminoManager.Web.Components;
 using CaminoManager.Web.Services;
 using MudBlazor.Services;
@@ -13,14 +12,15 @@ builder.AddRedisOutputCache("cache");
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-//builder.Services.AddScoped<PersonService>();
-
-builder.Services.AddHttpClient<PersonService>(client =>
+// Configure common HTTP client settings
+var apiClientBuilder = builder.Services.AddHttpClient("ApiClient", client =>
 {
-    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-    client.BaseAddress = new("https+http://apiservice");
+    client.BaseAddress = new Uri("https+http://apiservice");
 });
+
+// Register services using the common HTTP client
+builder.Services.AddScoped(sp => new PersonService(sp.GetRequiredService<IHttpClientFactory>().CreateClient("ApiClient")));
+builder.Services.AddScoped(sp => new CommunityService(sp.GetRequiredService<IHttpClientFactory>().CreateClient("ApiClient")));
 
 builder.Services.AddMudServices();
 
