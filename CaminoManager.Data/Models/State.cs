@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace CaminoManager.Data.Models;
@@ -6,8 +5,8 @@ namespace CaminoManager.Data.Models;
 public class State
 {
     [Key]
-    public Guid Id { get; set; }    
-    public string Name { get; set; }    
+    public Guid Id { get; set; }
+    public string Name { get; set; }
     public Guid CountryId { get; set; }
 
     // Navigation properties

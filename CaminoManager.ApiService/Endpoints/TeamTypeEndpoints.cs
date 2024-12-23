@@ -1,9 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-using CaminoManager.Data;
-using CaminoManager.Data.Models;
 using CaminoManager.ApiService.Mappers;
 using CaminoManager.Data.Contexts;
 using CaminoManager.ServiceDefaults.Dtos;
+using Microsoft.EntityFrameworkCore;
 
 namespace CaminoManager.ApiService.Endpoints;
 
@@ -65,4 +63,4 @@ public static class TeamTypeEndpoints
 
         return group;
     }
-} 
+}

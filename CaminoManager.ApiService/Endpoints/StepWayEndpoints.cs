@@ -1,9 +1,8 @@
-using CaminoManager.Data;
-using CaminoManager.Data.Models;
 using CaminoManager.ApiService.Mappers;
-using Microsoft.EntityFrameworkCore;
 using CaminoManager.Data.Contexts;
+using CaminoManager.Data.Models;
 using CaminoManager.ServiceDefaults.Dtos;
+using Microsoft.EntityFrameworkCore;
 
 namespace CaminoManager.ApiService.Endpoints;
 
@@ -58,4 +57,4 @@ public static class StepWayEndpoints
             return Results.NoContent();
         });
     }
-} 
+}

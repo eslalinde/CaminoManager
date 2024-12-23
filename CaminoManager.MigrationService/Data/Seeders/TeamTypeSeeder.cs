@@ -33,4 +33,4 @@ public static class TeamTypeSeeder
             await dbContext.SaveChangesAsync(cancellationToken);
         }
     }
-} 
+}

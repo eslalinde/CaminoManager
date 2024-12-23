@@ -37,7 +37,7 @@ public static class BrotherEndpoints
         // PUT update brother
         group.MapPut("/{personId}/{communityId}", async (Guid personId, Guid communityId, Brother brother, CaminoManagerDbContext db) =>
         {
-            if (personId != brother.PersonId || communityId != brother.CommunityId) 
+            if (personId != brother.PersonId || communityId != brother.CommunityId)
                 return Results.BadRequest();
 
             db.Entry(brother).State = EntityState.Modified;
@@ -67,4 +67,4 @@ public static class BrotherEndpoints
 
         return app;
     }
-} 
+}

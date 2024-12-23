@@ -14,7 +14,7 @@ public static class ParishSeeder
 
         // Get all cities to distribute parishes among them
         var cities = await dbContext.Cities.ToListAsync(cancellationToken);
-        
+
         var parishNames = new[]
         {
             "Parroquia La Visitación",
@@ -54,8 +54,8 @@ public static class ParishSeeder
                 Diocese = $"Diócesis de {city.Name}",
                 Address = faker.Address.StreetAddress(),
                 Phone = faker.Phone.PhoneNumber("(###) ###-####"),
-                Email = faker.Internet.Email(name.Replace("Parroquia ", "").Replace(" ", "").ToLower(), 
-                                          city.Name.ToLower(), 
+                Email = faker.Internet.Email(name.Replace("Parroquia ", "").Replace(" ", "").ToLower(),
+                                          city.Name.ToLower(),
                                           "iglesia.org"),
                 CityId = city.Id
             };
@@ -66,4 +66,4 @@ public static class ParishSeeder
         await dbContext.Parishes.AddRangeAsync(parishes, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
-} 
+}

@@ -1,9 +1,7 @@
-using System;
-using System.ComponentModel.DataAnnotations;
 namespace CaminoManager.Data.Models;
 
 public class Belong
-{    
+{
     public Guid PersonId { get; set; }
     public Guid CommunityId { get; set; }
     public Guid TeamId { get; set; }

@@ -36,4 +36,4 @@ public abstract class BaseApiService
         var response = await HttpClient.DeleteAsync(endpoint);
         response.EnsureSuccessStatusCode();
     }
-} 
+}

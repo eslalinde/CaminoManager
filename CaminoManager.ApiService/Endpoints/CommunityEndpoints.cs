@@ -1,7 +1,7 @@
 using CaminoManager.Data.Contexts;
 using CaminoManager.Data.Models;
-using Microsoft.EntityFrameworkCore;
 using CaminoManager.ServiceDefaults.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace CaminoManager.ApiService.Endpoints;
 
@@ -34,7 +34,7 @@ public static class CommunityEndpoints
         {
             var community = await db.Communities.FindAsync(id);
             if (community == null) return Results.NotFound();
-            
+
             return Results.Ok(new CommunityDto
             {
                 Id = community.Id,
@@ -65,10 +65,10 @@ public static class CommunityEndpoints
                 CatechistTeamId = dto.CatechistTeamId,
                 OldCatechist = dto.OldCatechist
             };
-            
+
             db.Communities.Add(community);
             await db.SaveChangesAsync();
-            return Results.Created($"/communities/{community.Id}", 
+            return Results.Created($"/communities/{community.Id}",
                 new CommunityDto { Id = community.Id, /* ... other properties ... */ });
         });
 
@@ -115,4 +115,4 @@ public static class CommunityEndpoints
 
         return app;
     }
-} 
+}

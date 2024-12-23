@@ -1,4 +1,4 @@
-namespace CaminoManager.ServiceDefaults.Dtos;
+namespace CaminoManager.ServiceDefaults.DTOs;
 
 public record ParishDto(
     Guid Id,
@@ -26,4 +26,4 @@ public record UpdateParishDto(
     string? Phone,
     string? Email,
     Guid CityId
-); 
+);

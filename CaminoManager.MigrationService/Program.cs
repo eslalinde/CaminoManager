@@ -1,5 +1,5 @@
-using CaminoManager.MigrationService;
 using CaminoManager.Data.Contexts;
+using CaminoManager.MigrationService;
 
 var builder = Host.CreateApplicationBuilder(args);
 

@@ -29,11 +29,11 @@ public static class PersonSeeder
             var husband = personFaker.Generate();
             husband.GenderId = GenderType.Male;
             husband.PersonTypeId = PersonType.Married;
-            
+
             var wife = personFaker.Generate();
             wife.GenderId = GenderType.Female;
             wife.PersonTypeId = PersonType.Married;
-            
+
             marriedPairs.Add((husband, wife));
         }
 
@@ -108,4 +108,4 @@ public static class PersonSeeder
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }
-} 
+}

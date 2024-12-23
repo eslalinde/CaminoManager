@@ -10,4 +10,4 @@ public partial class StepWayMapper
     public partial StepWayDto ToDto(StepWay entity);
     public partial StepWay ToEntity(CreateStepWayDto dto);
     public partial void UpdateEntity(UpdateStepWayDto dto, StepWay entity);
-} 
+}
