@@ -2,7 +2,7 @@ using CaminoManager.Data.Contexts;
 using CaminoManager.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CaminoManager.Data.Seeders;
+namespace CaminoManager.MigrationService.Data.Seeders;
 
 public static class LocationSeeder
 {

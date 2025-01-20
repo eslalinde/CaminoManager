@@ -1,20 +1,20 @@
 namespace CaminoManager.ServiceDefaults.DTOs;
 
-public class StepWayDto
+public class StepWayDto : StepWayBaseDto
 {
     public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public int Order { get; set; }
 }
 
-public class CreateStepWayDto
+public class StepWayBaseDto
 {
     public string Name { get; set; } = string.Empty;
     public int Order { get; set; }
 }
 
-public class UpdateStepWayDto
+public class CreateStepWayDto : StepWayBaseDto
 {
-    public string Name { get; set; } = string.Empty;
-    public int Order { get; set; }
+}
+
+public class UpdateStepWayDto : StepWayBaseDto
+{
 }

@@ -1,70 +1,68 @@
-using CaminoManager.Data.Contexts;
 using CaminoManager.Data.Models;
+using CaminoManager.ServiceDefaults.DTOs;
+using CaminoManager.ApiService.Mappers;
 using Microsoft.EntityFrameworkCore;
+using CaminoManager.Data.Contexts;
 
 namespace CaminoManager.ApiService.Endpoints;
 
 public static class BrotherEndpoints
 {
-    public static IEndpointRouteBuilder MapBrotherEndpoints(this IEndpointRouteBuilder app)
+    private static readonly BrotherMapper _mapper = new();
+
+    public static RouteGroupBuilder MapBrotherEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = app.MapGroup("/brothers").WithTags("Brothers");
+        var group = routes.MapGroup("/brothers").WithTags("Brothers");
 
-        // GET all brothers
         group.MapGet("/", async (CaminoManagerDbContext db) =>
-            await db.Brothers
-                .Include(b => b.Person)
-                .Include(b => b.Community)
-                .ToListAsync());
+        {
+            var brothers = await db.Set<Brother>().ToListAsync();
+            return brothers.Select(_mapper.ToDto);
+        });
 
-        // GET brother by person and community ids
         group.MapGet("/{personId}/{communityId}", async (Guid personId, Guid communityId, CaminoManagerDbContext db) =>
-            await db.Brothers
-                .Include(b => b.Person)
-                .Include(b => b.Community)
-                .FirstOrDefaultAsync(b => b.PersonId == personId && b.CommunityId == communityId) is Brother brother
-                    ? Results.Ok(brother)
-                    : Results.NotFound());
-
-        // POST new brother
-        group.MapPost("/", async (Brother brother, CaminoManagerDbContext db) =>
         {
-            db.Brothers.Add(brother);
+            var brother = await db.Set<Brother>()
+                .FirstOrDefaultAsync(b => b.PersonId == personId && b.CommunityId == communityId);
+            
+            return brother is null ? Results.NotFound() : Results.Ok(_mapper.ToDto(brother));
+        });
+
+        group.MapPost("/", async (CreateBrotherDto dto, CaminoManagerDbContext db) =>
+        {
+            var brother = _mapper.ToEntity(dto);
+            db.Set<Brother>().Add(brother);
             await db.SaveChangesAsync();
-            return Results.Created($"/brothers/{brother.PersonId}/{brother.CommunityId}", brother);
+            
+            return Results.Created($"/brothers/{brother.PersonId}/{brother.CommunityId}", _mapper.ToDto(brother));
         });
 
-        // PUT update brother
-        group.MapPut("/{personId}/{communityId}", async (Guid personId, Guid communityId, Brother brother, CaminoManagerDbContext db) =>
+        group.MapPut("/{personId}/{communityId}", async (Guid personId, Guid communityId, UpdateBrotherDto dto, CaminoManagerDbContext db) =>
         {
-            if (personId != brother.PersonId || communityId != brother.CommunityId)
-                return Results.BadRequest();
-
-            db.Entry(brother).State = EntityState.Modified;
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await db.Brothers.AnyAsync(b => b.PersonId == personId && b.CommunityId == communityId))
-                    return Results.NotFound();
-                throw;
-            }
-            return Results.NoContent();
+            var brother = await db.Set<Brother>()
+                .FirstOrDefaultAsync(b => b.PersonId == personId && b.CommunityId == communityId);
+            
+            if (brother is null) return Results.NotFound();
+            
+            _mapper.UpdateEntity(dto, brother);
+            await db.SaveChangesAsync();
+            
+            return Results.Ok(_mapper.ToDto(brother));
         });
 
-        // DELETE brother
         group.MapDelete("/{personId}/{communityId}", async (Guid personId, Guid communityId, CaminoManagerDbContext db) =>
         {
-            var brother = await db.Brothers.FindAsync(personId, communityId);
-            if (brother == null) return Results.NotFound();
-
-            db.Brothers.Remove(brother);
+            var brother = await db.Set<Brother>()
+                .FirstOrDefaultAsync(b => b.PersonId == personId && b.CommunityId == communityId);
+            
+            if (brother is null) return Results.NotFound();
+            
+            db.Set<Brother>().Remove(brother);
             await db.SaveChangesAsync();
+            
             return Results.NoContent();
         });
 
-        return app;
+        return group;
     }
 }

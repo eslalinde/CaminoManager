@@ -1,0 +1,96 @@
+@page "/parishes"
+@using CaminoManager.Web.Services
+@using Microsoft.Extensions.Localization
+@using CaminoManager.ServiceDefaults.DTOs
+@inject ParishService ParishService
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject IStringLocalizer<Shared> Localizer
+
+<PageTitle>@Localizer["Parishes"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["Parishes"]</MudText>
+
+<MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Filled" 
+           OnClick="@(() => NavigationManager.NavigateTo("/parishes/create"))" Class="mb-4">
+    @Localizer["NewParish"]
+</MudButton>
+
+@if (_parishes == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudDataGrid Items="_parishes" T="ParishDto" Dense="true" Hover="true" Bordered="true" Striped="true" 
+                 QuickFilter="@_quickFilter" FilterMode="@DataGridFilterMode.Simple">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">@Localizer["Parishes"]</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="@Localizer["Search"]" Adornment="Adornment.Start"
+                         Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" 
+                         Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Name" Title="@Localizer["Name"]" />
+            <PropertyColumn Property="x => x.Diocese" Title="@Localizer["Diocese"]" />
+            <PropertyColumn Property="x => x.Address" Title="@Localizer["Address"]" />
+            <PropertyColumn Property="x => x.Phone" Title="@Localizer["Phone"]" />
+            <PropertyColumn Property="x => x.Email" Title="@Localizer["Email"]" />
+            <PropertyColumn Property="x => x.CityName" Title="@Localizer["CityName"]" />
+
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" 
+                                 OnClick="@(() => NavigationManager.NavigateTo($"/parishes/edit/{context.Item.Id}"))" />
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" 
+                                 OnClick="@(async e => await DeleteParish(context.Item))" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="ParishDto" />
+        </PagerContent>
+    </MudDataGrid>
+}
+
+@code {
+    private List<ParishDto>? _parishes;
+    private string _searchString;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var parishes = await ParishService.GetParishesAsync();
+        _parishes = parishes.ToList();
+    }
+
+    private async Task DeleteParish(ParishDto parish)
+    {
+        var result = await DialogService.ShowMessageBox(
+            Localizer.GetString("DeleteParish"),
+            Localizer.GetString("DeleteParishMessage"),
+            yesText: Localizer.GetString("Delete"),
+            cancelText: Localizer.GetString("Cancel"));
+
+        if (result == true)
+        {
+            await ParishService.DeleteParishAsync(parish.Id);
+            var parishes = await ParishService.GetParishesAsync();
+            _parishes = parishes.ToList();
+        }
+    }
+
+    private Func<ParishDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Diocese.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+} 

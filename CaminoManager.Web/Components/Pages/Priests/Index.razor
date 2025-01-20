@@ -1,0 +1,81 @@
+@page "/priests"
+@using CaminoManager.Web.Services
+@using Microsoft.Extensions.Localization
+@using CaminoManager.ServiceDefaults.DTOs
+@inject PriestService PriestService
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject IStringLocalizer<Shared> Localizer
+
+<PageTitle>@Localizer["Priests"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["Priests"]</MudText>
+
+<MudButton StartIcon="@Icons.Material.Filled.Person" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => NavigationManager.NavigateTo("/priests/create"))" Class="mb-4">
+    @Localizer["AddPriest"]
+</MudButton>
+
+@if (_priests == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudDataGrid Items="_priests" T="PriestDto" Dense="true" Hover="true" Bordered="true" Striped="true" QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">@Localizer["Priests"]</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="@Localizer["Search"]" Adornment="Adornment.Start" Immediate="true"
+                         AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Name" Title="@Localizer["Name"]" />
+            <PropertyColumn Property="x => x.ParishName" Title="@Localizer["Parish"]" />
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@(() => NavigationManager.NavigateTo($"/priests/edit/{context.Item.Id}"))" />
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@(async e => await DeletePriest(context.Item))" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="PriestDto" />
+        </PagerContent>
+    </MudDataGrid>
+}
+
+@code {
+    private List<PriestDto>? _priests;
+    private string _searchString = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _priests = await PriestService.GetPriestsAsync();
+    }
+
+    private async Task DeletePriest(PriestDto priest)
+    {
+        var result = await DialogService.ShowMessageBox(
+            Localizer["DeletePriest"],
+            Localizer["DeletePriestMessage"],
+            yesText: Localizer["Delete"],
+            cancelText: Localizer["Cancel"]);
+
+        if (result == true)
+        {
+            await PriestService.DeletePriestAsync(Guid.Parse(priest.Id));
+            _priests = await PriestService.GetPriestsAsync();
+        }
+    }
+
+    private Func<PriestDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.ParishName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+} 

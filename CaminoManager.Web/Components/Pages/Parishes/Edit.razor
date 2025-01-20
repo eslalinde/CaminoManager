@@ -1,0 +1,56 @@
+@page "/parishes/edit/{Id}"
+@using CaminoManager.Web.Services
+@using Microsoft.Extensions.Localization
+@using CaminoManager.ServiceDefaults.DTOs
+@inject ParishService ParishService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<Shared> Localizer
+
+<PageTitle>@Localizer["EditParish"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["EditParish"]</MudText>
+
+@if (_parish == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <ParishForm Parish="_parish"
+                ButtonText="@Localizer["Update"]"
+                OnValidSubmit="UpdateParish"
+                OnCancel="Cancel" />
+}
+
+@code {
+    [Parameter] public string Id { get; set; }
+    private ParishDto? _parish;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _parish = await ParishService.GetParishByIdAsync(Id);
+    }
+
+    private async Task UpdateParish()
+    {
+        if (_parish != null)
+        {
+            await ParishService.UpdateParishAsync(Id, new UpdateParishDto()
+                {
+                    Name = _parish.Name,
+                    Diocese = _parish.Diocese,
+                    Address = _parish.Address,
+                    Phone = _parish.Phone,
+                    Email = _parish.Email,
+                    CityId = _parish.CityId,
+                    Priests = _parish.Priests
+                });
+            NavigationManager.NavigateTo("/parishes");
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/parishes");
+    }
+} 

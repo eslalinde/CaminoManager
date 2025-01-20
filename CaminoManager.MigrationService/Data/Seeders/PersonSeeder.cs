@@ -4,7 +4,7 @@ using CaminoManager.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Person = CaminoManager.Data.Models.Person;
 
-namespace CaminoManager.Data.Seeders;
+namespace CaminoManager.MigrationService.Data.Seeders;
 
 public static class PersonSeeder
 {
@@ -13,6 +13,8 @@ public static class PersonSeeder
         if (await dbContext.People.AnyAsync(cancellationToken))
             return;
 
+        var genderType = new[] { GenderType.Male, GenderType.Female };
+
         // Create faker for people
         var personFaker = new Faker<Person>()
             .RuleFor(p => p.Id, f => Guid.NewGuid())
@@ -20,7 +22,7 @@ public static class PersonSeeder
             .RuleFor(p => p.Phone, f => f.Phone.PhoneNumber("(###) ###-####"))
             .RuleFor(p => p.Mobile, f => f.Phone.PhoneNumber("+1 ###-###-####"))
             .RuleFor(p => p.Email, (f, p) => f.Internet.Email(p.PersonName))
-            .RuleFor(p => p.GenderId, f => f.Random.Enum<GenderType>());
+            .RuleFor(p => p.GenderId, f => f.Random.Enum(genderType));
 
         // Generate 15 married couples (30 people)
         var marriedPairs = new List<(Person Husband, Person Wife)>();

@@ -1,0 +1,43 @@
+@page "/priests/create"
+@using CaminoManager.ServiceDefaults.DTOs
+@using CaminoManager.Web.Services
+@using Microsoft.Extensions.Localization
+@inject PriestService PriestService
+@inject PersonService PersonService
+@inject ParishService ParishService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<Shared> Localizer
+
+<PageTitle>@Localizer["PriestCreate"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["PriestCreate"]</MudText>
+
+<PriestForm Priest="_priest"
+            People="_people"
+            Parishes="_parishes"
+            ButtonText="@Localizer["Create"]"
+            OnValidSubmit="CreatePriest"
+            OnCancel="Cancel" />
+
+@code {
+    private CreatePriestDto _priest = new();
+    private List<PersonDto>? _people;
+    private List<ParishDto>? _parishes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _people = await PersonService.GetPeopleAsync();
+        _parishes = await ParishService.GetParishesAsync();
+    }
+
+    private async Task CreatePriest()
+    {
+        await PriestService.CreatePriestAsync(_priest);
+        NavigationManager.NavigateTo("/priests");
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/priests");
+    }
+} 

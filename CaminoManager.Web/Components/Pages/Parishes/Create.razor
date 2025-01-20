@@ -1,0 +1,40 @@
+@page "/parishes/create"
+@using CaminoManager.ServiceDefaults.DTOs
+@using CaminoManager.Web.Services
+@using Microsoft.Extensions.Localization
+@inject ParishService ParishService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<Shared> Localizer
+
+<PageTitle>@Localizer["CreateParish"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["CreateParish"]</MudText>
+
+<ParishForm Parish="_parish"
+            ButtonText="@Localizer["Create"]"
+            OnValidSubmit="CreateParish"
+            OnCancel="Cancel" />
+
+@code {
+    private ParishDto _parish = new();
+
+    private async Task CreateParish()
+    {
+        await ParishService.CreateParishAsync(new CreateParishDto()
+            {
+                Name = _parish.Name,
+                Diocese = _parish.Diocese,
+                Address = _parish.Address,
+                Phone = _parish.Phone,
+                Email = _parish.Email,
+                CityId = _parish.CityId,
+                Priests = _parish.Priests
+            });
+        NavigationManager.NavigateTo("/parishes");
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/parishes");
+    }
+} 

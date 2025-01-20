@@ -11,7 +11,7 @@ public class CommunityService : BaseApiService
         return await GetListAsync<CommunityDto>("communities");
     }
 
-    public async Task<CommunityDto?> GetCommunityAsync(Guid id)
+    public async Task<CommunityDto?> GetCommunityAsync(string id)
     {
         return await GetAsync<CommunityDto>($"communities/{id}");
     }
@@ -26,7 +26,7 @@ public class CommunityService : BaseApiService
         await PutAsync($"communities/{community.Id}", community);
     }
 
-    public async Task DeleteCommunityAsync(Guid id)
+    public async Task DeleteCommunityAsync(string id)
     {
         await DeleteAsync($"communities/{id}");
     }

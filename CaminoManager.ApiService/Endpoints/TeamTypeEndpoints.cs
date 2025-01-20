@@ -1,6 +1,6 @@
 using CaminoManager.ApiService.Mappers;
 using CaminoManager.Data.Contexts;
-using CaminoManager.ServiceDefaults.Dtos;
+using CaminoManager.ServiceDefaults.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace CaminoManager.ApiService.Endpoints;
@@ -34,7 +34,7 @@ public static class TeamTypeEndpoints
             db.TeamTypes.Add(teamType);
             await db.SaveChangesAsync();
 
-            return Results.Created($"/api/teamtypes/{teamType.Id}", _mapper.ToDto(teamType));
+            return Results.Created($"/teamtypes/{teamType.Id}", _mapper.ToDto(teamType));
         });
 
         group.MapPut("/{id}", async (Guid id, UpdateTeamTypeDto dto, CaminoManagerDbContext db) =>
