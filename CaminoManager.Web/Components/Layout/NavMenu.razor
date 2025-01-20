@@ -1,6 +1,14 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All">Home</MudNavLink>
-    <MudNavLink Href="/people" Match="NavLinkMatch.Prefix">People</MudNavLink>
+﻿@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Shared> Localizer
+
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">@Localizer["Home"]</MudNavLink>
+    <MudNavLink Href="/people" Match="NavLinkMatch.Prefix">@Localizer["People"]</MudNavLink>
+    <MudNavLink Href="/countries" Match="NavLinkMatch.Prefix">@Localizer["Countries"]</MudNavLink>
+    <MudNavLink Href="/states" Match="NavLinkMatch.Prefix">@Localizer["States"]</MudNavLink>
+    <MudNavLink Href="/cities" Match="NavLinkMatch.Prefix">@Localizer["Cities"]</MudNavLink>
+    <MudNavLink Href="/parishes" Match="NavLinkMatch.Prefix">@Localizer["Parishes"]</MudNavLink>
+    <MudNavLink Href="/priests" Match="NavLinkMatch.Prefix">@Localizer["Priests"]</MudNavLink>
     @* <MudNavGroup Title="Settings" Expanded="true">
         <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
         <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>

@@ -3,7 +3,8 @@ namespace CaminoManager.Data.Models;
 public enum GenderType
 {
     Male,
-    Female
+    Female,
+    Unknown
 }
 
 public enum PersonType
@@ -14,5 +15,6 @@ public enum PersonType
     Seminarian = 4,    // Seminarista
     Deacon = 5,        // Diacono
     Nun = 6,           // Monja
-    Single = 7         // Soltero
+    Single = 7,         // Soltero
+    Unknown
 }

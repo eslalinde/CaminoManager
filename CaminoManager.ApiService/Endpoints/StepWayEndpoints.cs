@@ -1,7 +1,7 @@
 using CaminoManager.ApiService.Mappers;
 using CaminoManager.Data.Contexts;
 using CaminoManager.Data.Models;
-using CaminoManager.ServiceDefaults.Dtos;
+using CaminoManager.ServiceDefaults.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace CaminoManager.ApiService.Endpoints;
@@ -34,7 +34,7 @@ public static class StepWayEndpoints
             var entity = _mapper.ToEntity(dto);
             db.Set<StepWay>().Add(entity);
             await db.SaveChangesAsync();
-            return Results.Created($"/api/stepways/{entity.Id}", _mapper.ToDto(entity));
+            return Results.Created($"/stepways/{entity.Id}", _mapper.ToDto(entity));
         });
 
         group.MapPut("/{id}", async (Guid id, UpdateStepWayDto dto, CaminoManagerDbContext db) =>

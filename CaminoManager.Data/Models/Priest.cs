@@ -7,6 +7,7 @@ public class Priest
     public Guid Id { get; set; }
     public Guid PersonId { get; set; }
     public bool IsParishPriest { get; set; }
+    public Guid ParishId { get; set; }
 
     // Navigation properties
     public Person Person { get; set; } = null!;

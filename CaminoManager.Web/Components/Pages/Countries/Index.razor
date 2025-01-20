@@ -1,0 +1,113 @@
+@page "/countries"
+@using CaminoManager.ServiceDefaults.DTOs
+@using CaminoManager.Web.Services
+@using Microsoft.Extensions.Localization
+@inject CountryService CountryService
+@inject IDialogService DialogService
+@inject IStringLocalizer<Shared> Localizer
+
+
+<PageTitle>@Localizer["Countries"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["Countries"]</MudText>
+
+<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OpenCreateDialog">@Localizer["NewCountry"]</MudButton>
+
+
+@if (_countries == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudDataGrid Items="_countries" T="CountryDto" Dense="true" Hover="true" Bordered="true" Striped="true"
+                 EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual" CommittedItemChanges="@CommittedItemChanges"
+                 FilterMode="@DataGridFilterMode.Simple" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.Default"
+                 QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">@Localizer["Countries"]</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="@Localizer["Search"]" Adornment="Adornment.Start"
+                          Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+            <MudSpacer />
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Name" Title="@Localizer["Name"]">
+                <EditTemplate>
+                    <MudTextField @bind-Value="context.Item.Name" Required />
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.Code" Title="@Localizer["Code"]">
+                <EditTemplate>
+                    <MudTextField @bind-Value="context.Item.Code" />
+                </EditTemplate>
+            </PropertyColumn>
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit"
+                                   OnClick="@context.Actions.StartEditingItemAsync" />
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete"
+                                   OnClick="@(async _ => await DeleteCountry(context.Item))" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="CountryDto" />
+        </PagerContent>
+    </MudDataGrid>
+}
+
+@code {
+    private List<CountryDto>? _countries;
+    private string _searchString = string.Empty;
+
+    protected override async Task OnInitializedAsync() => await LoadCountries();
+
+    private async Task LoadCountries()
+    {
+        _countries = await CountryService.GetCountriesAsync();
+    }
+
+    private async Task DeleteCountry(CountryDto country)
+    {
+        var result = await DialogService.ShowMessageBox(
+            Localizer["DeleteCountry"],
+            Localizer["DeleteCountryMessage"],
+            yesText: Localizer["Delete"],
+            cancelText: Localizer["Cancel"]);
+
+        if (result == true)
+        {
+            await CountryService.DeleteCountryAsync(country.Id);
+            await LoadCountries();
+        }
+    }
+
+    private async Task CommittedItemChanges(CountryDto item)
+    {
+        await CountryService.UpdateCountryAsync(item);
+        await LoadCountries();
+    }
+
+    private Func<CountryDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        return (x.Name?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true) ||
+               (x.Code?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true);
+    };
+
+    private async Task OpenCreateDialog()
+    {
+        var dialog = await DialogService.ShowAsync<CreateCountryDialog>(Localizer["NewCountry"]);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var newCountry = (CountryDto)result.Data;
+            await CountryService.CreateCountryAsync(newCountry!);
+            await LoadCountries();
+        }
+    }
+} 

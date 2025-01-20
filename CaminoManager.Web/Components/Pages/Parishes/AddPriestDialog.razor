@@ -1,0 +1,39 @@
+@using CaminoManager.ServiceDefaults.DTOs
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Shared> Localizer
+@inject Services.PersonService PersonService
+
+<MudDialog>
+    <DialogContent>
+        <MudSelect T="PersonDto" Label="@Localizer["SelectPriest"]" 
+                  @bind-Value="_selectedPerson">
+            @foreach (var person in AvailablePriests)
+            {
+                <MudSelectItem Value="@person">@person.PersonName</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">@Localizer["Cancel"]</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">@Localizer["Add"]</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private List<PersonDto> AvailablePriests { get; set; } = new();
+    private PersonDto _selectedPerson;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // TODO: priest that are not in a parish yet
+        AvailablePriests = await PersonService.GetPeopleAsync(CaminoManager.Data.Models.PersonType.Priest);
+    }
+
+    private void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(_selectedPerson));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+} 

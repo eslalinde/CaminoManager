@@ -1,10 +1,15 @@
 @page "/people/edit/{Id:guid}"
 @using CaminoManager.Data.Models
 @using CaminoManager.Web.Services
+@using Microsoft.Extensions.Localization
+@using CaminoManager.ServiceDefaults.DTOs
 @inject PersonService PersonService
 @inject NavigationManager NavigationManager
+@inject IStringLocalizer<Shared> Localizer
 
-<MudText Typo="Typo.h3" Class="mb-4">Edit Person</MudText>
+<PageTitle>@Localizer["PersonEdit"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["PersonEdit"]</MudText>
 
 @if (_person == null)
 {
@@ -13,14 +18,14 @@
 else
 {
     <PersonForm Person="_person"
-               ButtonText="Update"
+                ButtonText="@Localizer["Update"]"
                OnValidSubmit="UpdatePerson"
                OnCancel="Cancel" />
 }
 
 @code {
-    [Parameter] public Guid Id { get; set; }
-    private Person? _person;
+    [Parameter] public string Id { get; set; }
+    private PersonDto? _person;
 
     protected override async Task OnInitializedAsync()
     {

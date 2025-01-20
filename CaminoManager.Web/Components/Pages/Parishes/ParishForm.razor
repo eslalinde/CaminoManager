@@ -1,0 +1,175 @@
+@using CaminoManager.ServiceDefaults.DTOs
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.Extensions.Localization
+@inject ILogger<ParishForm> Logger
+@inject IStringLocalizer<Shared> Localizer
+@inject Services.CityService CityService
+@inject Services.PersonService PersonService
+@inject IDialogService DialogService
+
+<EditForm Model="Parish" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField @bind-Value="Parish.Name"
+                                  Label="@Localizer["Name"]"
+                                  Required="true" />
+
+                    <MudTextField @bind-Value="Parish.Diocese"
+                                  Label="@Localizer["Diocese"]"
+                                  Required="true"
+                                  Class="mt-3" />
+
+                    <MudTextField @bind-Value="Parish.Address"
+                                  Label="@Localizer["Address"]"
+                                  Required="true"
+                                  Class="mt-3" />
+
+                    <MudTextField @bind-Value="Parish.Phone"
+                                  Label="@Localizer["Phone"]"
+                                  Pattern="[\(\)\s0-9\-\+]+"
+                                  Class="mt-3" />
+
+                    <MudTextField @bind-Value="Parish.Email"
+                                  Label="@Localizer["Email"]"
+                                  Class="mt-3" />
+
+                    <MudSelect @bind-Value="@(Parish.CityId)"
+                               Label="@Localizer["CityName"]"
+                               Required="true"
+                               Class="mt-3"
+                               AnchorOrigin="Origin.BottomCenter"
+                               Placeholder="@Localizer["SelectCity"]">
+                        @foreach (var city in Cities)
+                        {
+                            <MudSelectItem Value="@city.Id.ToString()">@city.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudDivider Class="my-6" />
+                    <MudText Typo="Typo.h6" Class="mb-4">@Localizer["Priests"]</MudText>
+
+                    <MudTable Items="@ParishPriests" Dense="true" Hover="true" Class="mt-3">
+                        <ToolBarContent>
+                            <MudButton Color="Color.Primary"
+                                       OnClick="OpenAddPriestDialog"
+                                       StartIcon="@Icons.Material.Filled.Add">
+                                @Localizer["AddPriest"]
+                            </MudButton>
+                        </ToolBarContent>
+                        <HeaderContent>
+                            <MudTh>@Localizer["Name"]</MudTh>
+                            <MudTh>@Localizer["IsParishPriest"]</MudTh>
+                            <MudTh>@Localizer["Remove"]</MudTh>
+                        </HeaderContent>
+                        <RowTemplate Context="priest">
+                            <MudTd>@priest.PersonName</MudTd>
+                            <MudTd>
+                                <MudCheckBox T="bool" 
+                                            @bind-Value="@priest.IsParishPriest" 
+                                            OnCheckedChanged="@(() => OnParishPriestChanged(priest))"
+                                            Disabled="@(HasParishPriest() && !priest.IsParishPriest)"/>
+                            </MudTd>
+                            <MudTd>
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                               OnClick="@(() => RemovePriest(priest))"
+                                               Size="Size.Small" />
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit"
+                               Color="Color.Primary"
+                               Variant="Variant.Filled"
+                               Class="mr-3">@Localizer[$"{@ButtonText}"]</MudButton>
+                    <MudButton OnClick="OnCancel"
+                               Color="Color.Secondary"
+                               Variant="Variant.Filled">@Localizer["Cancel"]</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    [Parameter] public ParishDto Parish { get; set; } = new();
+    [Parameter] public string ButtonText { get; set; } = "Save";
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private List<CityDto> Cities { get; set; } = new();
+    private List<ParishPriestDto> ParishPriests { get; set; } = new();
+    private List<PersonDto> AvailablePriests { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCities();
+        await LoadPriests();
+        ParishPriests = Parish.Priests?.ToList() ?? new();
+        Parish.Priests = ParishPriests;
+    }
+
+    private void Submit() => Logger.LogInformation("Id = {Id}", Parish?.Id);
+
+    private async Task LoadCities()
+    {
+        Cities = await CityService.GetCitiesAsync();
+    }
+
+    private async Task LoadPriests()
+    {
+        AvailablePriests = await PersonService.GetPeopleAsync(CaminoManager.Data.Models.PersonType.Priest);
+    }
+
+    private bool HasParishPriest()
+    {
+        return ParishPriests.Any(p => p.IsParishPriest);
+    }
+
+    private void OnParishPriestChanged(ParishPriestDto priest)
+    {
+        if (priest.IsParishPriest)
+        {
+            // If this priest is being set as parish priest, unset others
+            foreach (var p in ParishPriests.Where(p => p.PersonId != priest.PersonId))
+            {
+                p.IsParishPriest = false;
+            }
+        }
+        StateHasChanged();
+    }
+
+    private async Task OpenAddPriestDialog()
+    {
+        var parameters = new DialogParameters
+        {
+            { "AvailablePriests", AvailablePriests.Where(p => !ParishPriests.Any(pp => pp.PersonId == p.Id)).ToList() }
+        };
+
+        var dialog = await DialogService.ShowAsync<AddPriestDialog>("Add Priest");
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is PersonDto selectedPriest)
+        {
+            var parishPriest = new ParishPriestDto
+            {
+                PersonId = selectedPriest.Id,
+                PersonName = selectedPriest.PersonName,
+                IsParishPriest = !HasParishPriest() // Make first added priest the parish priest
+            };
+            ParishPriests.Add(parishPriest);
+            Parish.Priests = new List<ParishPriestDto>(ParishPriests);
+            StateHasChanged();
+        }
+    }
+
+    private void RemovePriest(ParishPriestDto priest)
+    {
+        ParishPriests.Remove(priest);
+        Parish.Priests = new List<ParishPriestDto>(ParishPriests);
+    }
+}

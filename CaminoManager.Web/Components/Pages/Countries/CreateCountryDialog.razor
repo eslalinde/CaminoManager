@@ -1,0 +1,43 @@
+@using CaminoManager.ServiceDefaults.DTOs
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Shared> Localizer
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" Model="@Country">
+            <MudTextField @bind-Value="Country.Name"
+                         Label="@Localizer["Name"]"
+                         Required="true"
+                         RequiredError="@Localizer["NameRequired"]" />
+
+            <MudTextField @bind-Value="Country.Code"
+                         Label="@Localizer["Code"]"
+                         Required="false"
+                         RequiredError="@Localizer["CodeRequired"]"
+                         MaxLength="2"
+                         Class="mt-3" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">@Localizer["Cancel"]</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">@Localizer["Create"]</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private MudForm _form;
+    private CountryDto Country { get; set; } = new();
+
+    private async Task Submit()
+    {
+        await _form.Validate();
+        if (_form.IsValid)
+        {
+            MudDialog.Close(DialogResult.Ok(Country));
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+} 

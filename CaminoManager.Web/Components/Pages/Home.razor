@@ -1,7 +1,8 @@
 ﻿@page "/"
+@using CaminoManager.Web
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Shared> Localizer
 
-<PageTitle>Home</PageTitle>
+<PageTitle>@Localizer["Home"]</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<h1></h1>

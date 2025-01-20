@@ -1,0 +1,56 @@
+@using CaminoManager.ServiceDefaults.DTOs
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Shared> Localizer
+@inject Services.CountryService CountryService
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" Model="@State">
+            <MudTextField @bind-Value="State.Name"
+                         Label="@Localizer["Name"]"
+                         Required="true"
+                         RequiredError="@Localizer["NameRequired"]"
+                         Class="mb-3" />
+
+            <MudSelect @bind-Value="State.CountryId" 
+                      Label="@Localizer["Country"]" 
+                      Required="true"
+                      Placeholder="@Localizer["SelectCountry"]"
+                      AnchorOrigin="Origin.BottomCenter"
+                      Class="mb-3">
+                @foreach (var country in Countries)
+                {
+                    <MudSelectItem Value="@country.Id">@country.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">@Localizer["Cancel"]</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">@Localizer["Create"]</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private MudForm _form;
+    private StateDto State { get; set; } = new();
+    private List<CountryDto> Countries { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Countries = await CountryService.GetCountriesAsync();
+    }
+
+    private async Task Submit()
+    {
+        await _form.Validate();
+        if (_form.IsValid)
+        {
+            MudDialog.Close(DialogResult.Ok(State));
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+} 

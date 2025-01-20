@@ -2,7 +2,7 @@ namespace CaminoManager.ServiceDefaults.DTOs;
 
 public class PersonDto
 {
-    public Guid Id { get; set; }
+    public string Id { get; set; }
     public string PersonName { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public string Mobile { get; set; } = string.Empty;
@@ -15,5 +15,5 @@ public class PersonDto
 
 public class PersonDetailDto : PersonDto
 {
-    public Guid? SpouseId { get; set; }
+    public string? SpouseId { get; set; }
 }

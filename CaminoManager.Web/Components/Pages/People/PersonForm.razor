@@ -1,6 +1,9 @@
 @using CaminoManager.Data.Models
+@using CaminoManager.ServiceDefaults.DTOs
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.Extensions.Localization
 @inject ILogger<PersonForm> Logger
+@inject IStringLocalizer<Shared> Localizer
 
 <EditForm Model="Person" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
@@ -9,47 +12,53 @@
         <MudItem xs="12" sm="7">
             <MudCard>
                 <MudCardContent>
-                    <MudTextField @bind-Value="Person.PersonName" 
-                                Label="Name" 
-                                Required="true" />
-                                
-                    <MudTextField @bind-Value="Person.Phone" 
-                                Label="Phone"
-                                Pattern="[0-9\-\+]+" />
-                                
-                    <MudTextField @bind-Value="Person.Mobile" 
-                                Label="Mobile"
-                                Pattern="[0-9\-\+]+" />
-                                
-                    <MudTextField @bind-Value="Person.Email" 
-                                Label="Email" 
-                                Required="true" />
-                                
-                    <MudSelect T="PersonType" @bind-Value="Person.PersonTypeId"
-                            Label="Person Type"
-                            Required="true">
-                        @foreach (var type in Enum.GetValues(typeof(PersonType)))
+                    <MudTextField @bind-Value="Person.PersonName"
+                                  Label="@Localizer["Name"]"
+                                  Required="true" />
+
+                    <MudTextField @bind-Value="Person.Phone"
+                                  Label="@Localizer["Phone"]"
+                                  Pattern="[0-9\-\+]+"
+                                  Class="mt-3" />
+
+                    <MudTextField @bind-Value="Person.Mobile"
+                                  Label="@Localizer["Mobile"]"
+                                  Pattern="[0-9\-\+]+"
+                                  Class="mt-3" />
+
+                    <MudTextField @bind-Value="Person.Email"
+                                  Label="@Localizer["Email"]"
+                                  Required="true"
+                                  Class="mt-3" />
+
+                    <MudSelect T="int" @bind-Value="Person.PersonTypeId"
+                               Label="@Localizer["PersonType"]"
+                               Required="true"
+                               Class="mt-3">
+                        @foreach (PersonType type in Enum.GetValues(typeof(PersonType)))
                         {
-                            <MudSelectItem Value="@((PersonType)type)">@type</MudSelectItem>
+                            <MudSelectItem Value="@((int)type)">@Localizer[$"{@type}"]</MudSelectItem>
                         }
                     </MudSelect>
-                    
-                    <MudSelect T="GenderType" @bind-Value="Person.GenderId"
-                            Label="Gender"
-                            Required="true">
-                        @foreach (var gender in Enum.GetValues(typeof(GenderType)))
+
+                    <MudSelect T="int" @bind-Value="Person.GenderId"
+                               Label="@Localizer["Gender"]"
+                               Required="true"
+                               Class="mt-3">
+                        @foreach (GenderType gender in Enum.GetValues(typeof(GenderType)))
                         {
-                            <MudSelectItem Value="@((GenderType)gender)">@gender</MudSelectItem>
+                            <MudSelectItem Value="@((int)gender)">@Localizer[$"{@gender}"]</MudSelectItem>
                         }
                     </MudSelect>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" 
-                            Color="Color.Primary" 
-                            Variant="Variant.Filled">@ButtonText</MudButton>
-                    <MudButton OnClick="OnCancel" 
-                            Color="Color.Secondary" 
-                            Variant="Variant.Filled">Cancel</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit"
+                               Color="Color.Primary"
+                               Variant="Variant.Filled"
+                               Class="mr-3">@Localizer[$"{@ButtonText}"]</MudButton>
+                    <MudButton OnClick="OnCancel"
+                               Color="Color.Secondary"
+                               Variant="Variant.Filled">@Localizer["Cancel"]</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
@@ -57,7 +66,7 @@
 </EditForm>
 
 @code {
-    [Parameter] public Person Person { get; set; } = new();
+    [Parameter] public PersonDto Person { get; set; } = new();
     [Parameter] public string ButtonText { get; set; } = "Save";
     [Parameter] public EventCallback OnValidSubmit { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }

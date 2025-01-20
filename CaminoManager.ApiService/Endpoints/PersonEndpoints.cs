@@ -13,14 +13,23 @@ public static class PersonEndpoints
         var group = app.MapGroup("/people").WithTags("People");
         var mapper = new PersonMapper();
 
-        // GET all persons
-        group.MapGet("/", async (CaminoManagerDbContext db) =>
-            await db.People
+        // GET all persons with optional personType filter
+        group.MapGet("/", async (int? personType, CaminoManagerDbContext db) =>
+        {
+            var query = db.People.AsQueryable();
+            
+            if (personType.HasValue)
+            {
+                query = query.Where(p => (int)p.PersonTypeId == personType.Value);
+            }
+
+            return await query
                 .Select(p => mapper.ToDto(p))
-                .ToListAsync());
+                .ToListAsync();
+        });
 
         // GET person by id
-        group.MapGet("/{id}", async (Guid id, CaminoManagerDbContext db) =>
+        group.MapGet("/{id}", async (string id, CaminoManagerDbContext db) =>
             await db.People.FindAsync(id) is Person person
                 ? Results.Ok(mapper.ToDetailDto(person))
                 : Results.NotFound());
@@ -35,7 +44,7 @@ public static class PersonEndpoints
         });
 
         // PUT update person
-        group.MapPut("/{id}", async (Guid id, PersonDto personDto, CaminoManagerDbContext db) =>
+        group.MapPut("/{id}", async (string id, PersonDto personDto, CaminoManagerDbContext db) =>
         {
             if (id != personDto.Id) return Results.BadRequest();
 
@@ -47,7 +56,7 @@ public static class PersonEndpoints
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await db.People.AnyAsync(p => p.Id == id))
+                if (!await db.People.AnyAsync(p => p.Id == Guid.Parse(id)))
                     return Results.NotFound();
                 throw;
             }
@@ -55,7 +64,7 @@ public static class PersonEndpoints
         });
 
         // DELETE person
-        group.MapDelete("/{id}", async (Guid id, CaminoManagerDbContext db) =>
+        group.MapDelete("/{id}", async (string id, CaminoManagerDbContext db) =>
         {
             var person = await db.People.FindAsync(id);
             if (person == null) return Results.NotFound();

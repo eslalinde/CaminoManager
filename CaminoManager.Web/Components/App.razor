@@ -4,14 +4,22 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="/" />
-    <link rel="stylesheet" href="@Assets["app.css"]" />
-    <link rel="stylesheet" href="@Assets["CaminoManager.Web.styles.css"]" />
+    <base href="/" />    
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet @rendermode="InteractiveServer" />
+    <script>
+    window.blazorCulture = {
+        get: () => window.localStorage.getItem('BlazorCulture'),
+        set: (value) => {
+            window.localStorage.setItem('BlazorCulture', value);
+            const culture = value.split('|')[0]; // Extract culture from cookie value
+            document.cookie = `.AspNetCore.Culture=${value}; path=/; max-age=2592000`; // 30 days
+        }
+    };
+</script>
 </head>
 
 <body>
