@@ -1,18 +1,23 @@
 @page "/people/create"
 @using CaminoManager.Data.Models
+@using CaminoManager.ServiceDefaults.DTOs
 @using CaminoManager.Web.Services
+@using Microsoft.Extensions.Localization
 @inject PersonService PersonService
 @inject NavigationManager NavigationManager
+@inject IStringLocalizer<Shared> Localizer
 
-<MudText Typo="Typo.h3" Class="mb-4">Create Person</MudText>
+<PageTitle>@Localizer["PersonCreate"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["PersonCreate"]</MudText>
 
 <PersonForm Person="_person"
-           ButtonText="Create"
+            ButtonText="@Localizer["Create"]"
            OnValidSubmit="CreatePerson"
            OnCancel="Cancel" />
 
 @code {
-    private Person _person = new();
+    private PersonDto _person = new();
 
     private async Task CreatePerson()
     {

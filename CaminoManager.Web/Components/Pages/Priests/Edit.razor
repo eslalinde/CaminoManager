@@ -1,0 +1,69 @@
+@page "/priests/edit/{Id:guid}"
+@using CaminoManager.ServiceDefaults.DTOs
+@using CaminoManager.Web.Services
+@using Microsoft.Extensions.Localization
+@inject PriestService PriestService
+@inject PersonService PersonService
+@inject ParishService ParishService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<Shared> Localizer
+
+<PageTitle>@Localizer["PriestEdit"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["PriestEdit"]</MudText>
+
+@if (_priest == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <PriestForm Priest="_priest"
+                People="_people"
+                Parishes="_parishes"
+                ButtonText="@Localizer["Update"]"
+                OnValidSubmit="UpdatePriest"
+                OnCancel="Cancel" />
+}
+
+@code {
+    [Parameter] public string Id { get; set; }
+    private CreatePriestDto? _priest;
+    private List<PersonDto>? _people;
+    private List<ParishDto>? _parishes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var priest = await PriestService.GetPriestAsync(Id);
+        if (priest != null)
+        {
+            _priest = new CreatePriestDto
+            {
+                PersonId = priest.PersonId,
+                ParishId = priest.ParishId
+            };
+        }
+        _people = await PersonService.GetPeopleAsync();
+        _parishes = await ParishService.GetParishesAsync();
+    }
+
+    private async Task UpdatePriest()
+    {
+        if (_priest != null)
+        {
+            var updateDto = new UpdatePriestDto
+            {
+                Id = Guid.Parse(Id).ToString(),
+                PersonId = _priest.PersonId,
+                ParishId = _priest.ParishId
+            };
+            await PriestService.UpdatePriestAsync(updateDto);
+            NavigationManager.NavigateTo("/priests");
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/priests");
+    }
+} 

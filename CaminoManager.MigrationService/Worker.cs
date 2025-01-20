@@ -1,5 +1,5 @@
 using CaminoManager.Data.Contexts;
-using CaminoManager.Data.Seeders;
+using CaminoManager.MigrationService.Data.Seeders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -15,7 +15,7 @@ public class Worker(
     public const string ActivitySourceName = "Migrations";
     private static readonly ActivitySource s_activitySource = new(ActivitySourceName);
 
-    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var activity = s_activitySource.StartActivity("Migrating database", ActivityKind.Client);
 
@@ -24,9 +24,9 @@ public class Worker(
             using var scope = serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<CaminoManagerDbContext>();
 
-            await EnsureDatabaseAsync(dbContext, cancellationToken);
-            await RunMigrationAsync(dbContext, cancellationToken);
-            await SeedDataAsync(dbContext, cancellationToken);
+            await EnsureDatabaseAsync(dbContext, stoppingToken);
+            await RunMigrationAsync(dbContext, stoppingToken);
+            await SeedDataAsync(dbContext, stoppingToken);
         }
         catch (Exception ex)
         {
@@ -59,9 +59,9 @@ public class Worker(
         await strategy.ExecuteAsync(async () =>
         {
             // Run migration in a transaction to avoid partial migration if it fails.
-            //await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+            // await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
             await dbContext.Database.MigrateAsync(cancellationToken);
-            //await transaction.CommitAsync(cancellationToken);
+            // await transaction.CommitAsync(cancellationToken);
         });
     }
 
@@ -70,9 +70,10 @@ public class Worker(
         using var activity = s_activitySource.StartActivity("Seeding data");
         await LocationSeeder.SeedLocationsAsync(dbContext, cancellationToken);
         await StepWaySeeder.SeedStepWaysAsync(dbContext, cancellationToken);
+        await TeamTypeSeeder.SeedTeamTypesAsync(dbContext, cancellationToken);
+        await PriestSeeder.SeedPriestsAsync(dbContext, cancellationToken);
         await ParishSeeder.SeedParishesAsync(dbContext, cancellationToken);
         await PersonSeeder.SeedPeopleAsync(dbContext, cancellationToken);
         await CommunitySeeder.SeedCommunitiesAsync(dbContext, cancellationToken);
-        await TeamTypeSeeder.SeedTeamTypesAsync(dbContext, cancellationToken);
     }
 }

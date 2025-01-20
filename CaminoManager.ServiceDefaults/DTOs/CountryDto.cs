@@ -1,20 +1,20 @@
 namespace CaminoManager.ServiceDefaults.DTOs;
 
-public class CountryDto
+public class CountryDto : CountryBaseDto
 {
-    public Guid Id { get; set; }
+    public string Id { get; set; }
+}
+
+public class CountryBaseDto
+{
     public string Name { get; set; } = string.Empty;
     public string? Code { get; set; }
 }
 
-public class CreateCountryDto
+public class CreateCountryDto : CountryBaseDto
 {
-    public string Name { get; set; } = string.Empty;
-    public string? Code { get; set; }
 }
 
-public class UpdateCountryDto
+public class UpdateCountryDto : CountryBaseDto
 {
-    public string Name { get; set; } = string.Empty;
-    public string? Code { get; set; }
 }

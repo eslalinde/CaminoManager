@@ -1,0 +1,131 @@
+@page "/states"
+@using CaminoManager.ServiceDefaults.DTOs
+@using CaminoManager.Web.Services
+@using Microsoft.Extensions.Localization
+@inject StateService StateService
+@inject CountryService CountryService
+@inject IDialogService DialogService
+@inject IStringLocalizer<Shared> Localizer
+
+<PageTitle>@Localizer["States"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["States"]</MudText>
+
+<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OpenCreateDialog">@Localizer["NewState"]</MudButton>
+
+@if (_states == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudDataGrid Items="_states" T="StateDto" Dense="true" Hover="true" Bordered="true" Striped="true"
+                 EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual" CommittedItemChanges="@CommittedItemChanges"
+                 FilterMode="@DataGridFilterMode.Simple" FilterCaseSensitivity="@DataGridFilterCaseSensitivity.Default"
+                 QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">@Localizer["States"]</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="@Localizer["Search"]" Adornment="Adornment.Start"
+                          Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+            <MudSpacer />
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Name" Title="@Localizer["Name"]">
+                <EditTemplate>
+                    <MudTextField @bind-Value="context.Item.Name" Required />
+                </EditTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.CountryId" Title="@Localizer["Country"]">
+                <CellTemplate>
+                    @Countries.FirstOrDefault(c => c.Id == context.Item.CountryId)?.Name
+                </CellTemplate>
+                <EditTemplate>
+                    <MudSelect Guid @bind-Value="context.Item.CountryId" Required>
+                        @foreach (var country in Countries)
+                        {
+                            <MudSelectItem Value="@country.Id">@country.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </EditTemplate>
+            </PropertyColumn>
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit"
+                                   OnClick="@context.Actions.StartEditingItemAsync" />
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete"
+                                   OnClick="@(async _ => await DeleteState(context.Item))" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="StateDto" />
+        </PagerContent>
+    </MudDataGrid>
+}
+
+@code {
+    private List<StateDto>? _states;
+    private List<CountryDto> Countries { get; set; } = new();
+    private string _searchString = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Countries = await CountryService.GetCountriesAsync();
+        await LoadStates();
+    }
+
+    private async Task LoadStates()
+    {
+        _states = await StateService.GetStatesAsync();
+    }
+
+    private async Task DeleteState(StateDto state)
+    {
+        var result = await DialogService.ShowMessageBox(
+            Localizer["DeleteState"],
+            Localizer["DeleteStateMessage"],
+            yesText: Localizer["Delete"],
+            cancelText: Localizer["Cancel"]);
+
+        if (result == true)
+        {
+            await StateService.DeleteStateAsync(state.Id);
+            await LoadStates();
+        }
+    }
+
+    private async Task CommittedItemChanges(StateDto item)
+    {
+        await StateService.UpdateStateAsync(item);
+        await LoadStates();
+    }
+
+    private Func<StateDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        return (x.Name?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true) ||
+               (Countries.FirstOrDefault(c => c.Id == x.CountryId)?.Name?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true);
+    };
+
+    private async Task OpenCreateDialog()
+    {
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateStateDialog>(Localizer["NewState"], options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var newState = (StateDto)result.Data;
+            await StateService.CreateStateAsync(newState!);
+            await LoadStates();
+        }
+    }
+} 

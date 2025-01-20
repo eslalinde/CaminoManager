@@ -1,5 +1,5 @@
 using CaminoManager.Data.Models;
-using CaminoManager.ServiceDefaults.Dtos;
+using CaminoManager.ServiceDefaults.DTOs;
 using Riok.Mapperly.Abstractions;
 
 namespace CaminoManager.ApiService.Mappers;

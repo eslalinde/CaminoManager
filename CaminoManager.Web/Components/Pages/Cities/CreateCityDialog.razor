@@ -1,0 +1,78 @@
+@using CaminoManager.ServiceDefaults.DTOs
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Shared> Localizer
+@inject Services.StateService StateService
+@inject Services.CountryService CountryService
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" Model="@City">
+            <MudTextField @bind-Value="City.Name"
+                         Label="@Localizer["Name"]"
+                         Required="true"
+                         RequiredError="@Localizer["NameRequired"]" />
+
+            <MudSelect Guid @bind-Value="City.StateId" Label="@Localizer["State"]" Required="true" @onchange="OnStateSelected">
+                @foreach (var state in States)
+                {
+                    <MudSelectItem Value="@state.Id">@state.Name</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudSelect Guid @bind-Value="City.CountryId" Label="@Localizer["Country"]" Required="true" Disabled="@IsCountrySelectDisabled">
+                @foreach (var country in Countries)
+                {
+                    <MudSelectItem Value="@country.Id">@country.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">@Localizer["Cancel"]</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">@Localizer["Create"]</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private MudForm _form;
+    private CityDto City { get; set; } = new();
+    private List<StateDto> States { get; set; } = new();
+    private List<CountryDto> Countries { get; set; } = new();
+    private bool IsCountrySelectDisabled { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        States = await StateService.GetStatesAsync();
+        Countries = await CountryService.GetCountriesAsync();
+    }
+
+    private async Task Submit()
+    {
+        await _form.Validate();
+        if (_form.IsValid)
+        {
+            MudDialog.Close(DialogResult.Ok(City));
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void OnStateSelected(ChangeEventArgs e)
+    {
+        if (Guid.TryParse(e.Value?.ToString(), out Guid stateId))
+        {
+            var selectedState = States.FirstOrDefault(s => Guid.Parse(s.Id) == stateId);
+            if (selectedState != null)
+            {
+                City.CountryId = selectedState.CountryId;
+                IsCountrySelectDisabled = true;
+            }
+            else
+            {
+                IsCountrySelectDisabled = false;
+            }
+        }
+    }
+} 

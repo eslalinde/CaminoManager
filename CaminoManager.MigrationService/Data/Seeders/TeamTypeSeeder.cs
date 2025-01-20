@@ -2,7 +2,7 @@ using CaminoManager.Data.Contexts;
 using CaminoManager.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CaminoManager.Data.Seeders;
+namespace CaminoManager.MigrationService.Data.Seeders;
 
 public static class TeamTypeSeeder
 {
@@ -16,8 +16,7 @@ public static class TeamTypeSeeder
             (name: "Catequistas de la Nación", order: 1),
             (name: "Itinerantes", order: 2),
             (name: "Catequistas", order: 3),
-            (name: "Responsables", order: 4),
-            (name: "Corresponsables", order: 5)
+            (name: "Responsables", order: 4)
         };
 
         foreach (var (name, order) in teamTypes)

@@ -57,6 +57,7 @@ app.MapCityEndpoints();
 app.MapTeamTypeEndpoints();
 app.MapParishEndpoints();
 app.MapStepWayEndpoints();
+app.MapPriestEndpoints();
 
 app.MapDefaultEndpoints();
 

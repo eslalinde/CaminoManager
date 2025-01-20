@@ -1,0 +1,32 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.Extensions.Localization
+@using CaminoManager.Web
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<Shared> Localizer
+@inject IJSRuntime JSRuntime
+
+<MudSelect T="string" Value="@CurrentCulture" ValueChanged="@LanguageChanged" Dense="true" Class="mt-0 py-0" Style="min-width: 100px;">
+    <MudSelectItem Value="@("es")" Icon="@Icons.Material.Outlined.Flag">ES</MudSelectItem>
+    <MudSelectItem Value="@("en")" Icon="@Icons.Material.Outlined.Flag">EN</MudSelectItem>
+</MudSelect>
+
+@code {
+    private string CurrentCulture => CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+
+    private async Task LanguageChanged(string newCulture)
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        query["culture"] = newCulture;
+
+        // Set the culture cookie
+        await JSRuntime.InvokeVoidAsync(
+            "blazorCulture.set", 
+            CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(newCulture))
+        );
+        
+        var newUrl = $"{uri.GetComponents(UriComponents.Path, UriFormat.UriEscaped)}?{query}";
+        NavigationManager.NavigateTo(newUrl, forceLoad: true);
+    }
+} 

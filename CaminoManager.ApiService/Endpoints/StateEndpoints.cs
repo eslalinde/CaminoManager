@@ -1,6 +1,6 @@
 using CaminoManager.ApiService.Mappers;
 using CaminoManager.Data.Contexts;
-using CaminoManager.ServiceDefaults.Dtos;
+using CaminoManager.ServiceDefaults.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace CaminoManager.ApiService.Endpoints;
@@ -31,7 +31,7 @@ public static class StateEndpoints
             var state = _mapper.ToEntity(dto);
             db.States.Add(state);
             await db.SaveChangesAsync();
-            return Results.Created($"/api/states/{state.Id}", _mapper.ToDto(state));
+            return Results.Created($"/states/{state.Id}", _mapper.ToDto(state));
         });
 
         group.MapPut("/{id}", async (Guid id, UpdateStateDto dto, CaminoManagerDbContext db) =>

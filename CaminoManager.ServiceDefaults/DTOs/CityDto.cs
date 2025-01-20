@@ -1,23 +1,21 @@
 namespace CaminoManager.ServiceDefaults.DTOs;
 
-public class CityDto
+public class CityBaseDto
 {
-    public Guid Id { get; set; }
     public string Name { get; set; } = null!;
-    public Guid StateId { get; set; }
-    public Guid CountryId { get; set; }
+    public string StateId { get; set; } = null!;
+    public string CountryId { get; set; } = null!;
 }
 
-public class CreateCityDto
+public class CityDto : CityBaseDto
 {
-    public string Name { get; set; } = null!;
-    public Guid StateId { get; set; }
-    public Guid CountryId { get; set; }
+    public string Id { get; set; } = null!;
 }
 
-public class UpdateCityDto
+public class CreateCityDto : CityBaseDto
 {
-    public string Name { get; set; } = null!;
-    public Guid StateId { get; set; }
-    public Guid CountryId { get; set; }
+}
+
+public class UpdateCityDto : CityBaseDto
+{
 }
