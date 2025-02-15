@@ -1,0 +1,63 @@
+@page "/communities/edit/{Id}"
+@using CaminoManager.ServiceDefaults.DTOs
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Shared> Localizer
+@inject NavigationManager NavigationManager
+@inject Services.CommunityService CommunityService
+
+<PageTitle>@Localizer["EditCommunity"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["EditCommunity"]</MudText>
+
+@if (_community == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <CommunityForm 
+        Community="@_community"
+        ButtonText="@Localizer["Update"]"
+        OnValidSubmit="UpdateCommunity"
+        OnCancel="Cancel" />
+}
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+    private CommunityDto? _community;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _community = await CommunityService.GetCommunityAsync(Id);
+        if (_community == null)
+        {
+            NavigationManager.NavigateTo("/communities");
+        }
+    }
+
+    private async Task UpdateCommunity()
+    {
+        if (_community != null)
+        {
+            var updateDto = new UpdateCommunityDto
+            {
+                Id = _community.Id,
+                Number = _community.Number,
+                BornDate = _community.BornDate,
+                ParishId = _community.ParishId,
+                BornBrothers = _community.BornBrothers,
+                ActualBrothers = _community.ActualBrothers,
+                StepWayId = _community.StepWayId,
+                StepWayDate = _community.StepWayDate,
+                OldCatechist = _community.OldCatechist
+            };
+            await CommunityService.UpdateCommunityAsync(updateDto);
+            NavigationManager.NavigateTo("/communities");
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/communities");
+    }
+} 

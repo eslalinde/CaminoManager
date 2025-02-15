@@ -1,0 +1,41 @@
+@page "/communities/create"
+@using CaminoManager.ServiceDefaults.DTOs
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Shared> Localizer
+@inject NavigationManager NavigationManager
+@inject Services.CommunityService CommunityService
+
+<PageTitle>@Localizer["NewCommunity"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["NewCommunity"]</MudText>
+
+<CommunityForm 
+    Community="@_community"
+    ButtonText="@Localizer["Create"]"
+    OnValidSubmit="CreateCommunity"
+    OnCancel="Cancel" />
+
+@code {
+    private CommunityDto _community = new();
+
+    private async Task CreateCommunity()
+    {
+        await CommunityService.CreateCommunityAsync(new CreateCommunityDto()
+        {
+            Number = _community.Number,
+            BornDate = _community.BornDate,
+            ParishId = _community.ParishId,
+            BornBrothers = _community.BornBrothers,
+            ActualBrothers = _community.ActualBrothers,
+            StepWayId = _community.StepWayId,
+            StepWayDate = _community.StepWayDate,
+            OldCatechist = _community.OldCatechist
+        });
+        NavigationManager.NavigateTo("/communities");
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/communities");
+    }
+} 
