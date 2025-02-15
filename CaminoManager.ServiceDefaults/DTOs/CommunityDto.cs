@@ -1,33 +1,29 @@
 namespace CaminoManager.ServiceDefaults.DTOs;
 
-public class CommunityDto
+public class CommunityDtoBase
 {
-    public Guid Id { get; set; }
     public string Number { get; set; } = string.Empty;
     public DateTime BornDate { get; set; }
-    public Guid ParishId { get; set; }
+    public string ParishId { get; set; } = string.Empty;
     public int BornBrothers { get; set; }
     public int ActualBrothers { get; set; }
-    public Guid StepWayId { get; set; }
+    public List<BrotherDto> Brothers { get; set; } = new();
+    public string StepWayId { get; set; } = string.Empty;
     public DateTime? StepWayDate { get; set; }
-    public Guid? CatechistTeamId { get; set; }
+    public string? CatechistTeamId { get; set; }
     public string? OldCatechist { get; set; }
 }
 
-public class CreateCommunityDto
+public class CommunityDto : CommunityDtoBase
 {
-    public string Number { get; set; } = string.Empty;
-    public DateTime BornDate { get; set; }
-    public Guid ParishId { get; set; }
-    public int BornBrothers { get; set; }
-    public int ActualBrothers { get; set; }
-    public Guid StepWayId { get; set; }
-    public DateTime? StepWayDate { get; set; }
-    public Guid? CatechistTeamId { get; set; }
-    public string? OldCatechist { get; set; }
+    public string Id { get; set; } = string.Empty;
+}
+
+public class CreateCommunityDto : CommunityDtoBase
+{
 }
 
 public class UpdateCommunityDto : CreateCommunityDto
 {
-    public Guid Id { get; set; }
+    public string Id { get; set; } = string.Empty;
 }

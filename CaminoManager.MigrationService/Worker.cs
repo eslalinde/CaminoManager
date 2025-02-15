@@ -71,9 +71,9 @@ public class Worker(
         await LocationSeeder.SeedLocationsAsync(dbContext, cancellationToken);
         await StepWaySeeder.SeedStepWaysAsync(dbContext, cancellationToken);
         await TeamTypeSeeder.SeedTeamTypesAsync(dbContext, cancellationToken);
-        await PriestSeeder.SeedPriestsAsync(dbContext, cancellationToken);
-        await ParishSeeder.SeedParishesAsync(dbContext, cancellationToken);
         await PersonSeeder.SeedPeopleAsync(dbContext, cancellationToken);
+        await ParishSeeder.SeedParishesAsync(dbContext, cancellationToken);
+        await PriestSeeder.SeedPriestsAsync(dbContext, cancellationToken);
         await CommunitySeeder.SeedCommunitiesAsync(dbContext, cancellationToken);
     }
 }

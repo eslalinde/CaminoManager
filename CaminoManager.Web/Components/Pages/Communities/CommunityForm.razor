@@ -1,0 +1,113 @@
+@using CaminoManager.ServiceDefaults.DTOs
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.Extensions.Localization
+@inject ILogger<CommunityForm> Logger
+@inject IStringLocalizer<Shared> Localizer
+@inject Services.ParishService ParishService
+
+<EditForm Model="Community" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField @bind-Value="Community.Number"
+                                Label="@Localizer["Number"]"
+                                Required="true" />
+
+                    <MudDatePicker @bind-Value="Community.BornDate"
+                                 Label="@Localizer["BornDate"]"
+                                 Required="true"
+                                 Class="mt-3" />
+
+                    <MudSelect @bind-Value="@(Community.ParishId)"
+                             Label="@Localizer["Parish"]"
+                             Required="true"
+                             Class="mt-3"
+                             AnchorOrigin="Origin.BottomCenter"
+                             Placeholder="@Localizer["SelectParish"]">
+                        @foreach (var parish in Parishes)
+                        {
+                            <MudSelectItem Value="@parish.Id.ToString()">@parish.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudNumericField @bind-Value="Community.BornBrothers"
+                                   Label="@Localizer["BornBrothers"]"
+                                   Required="true"
+                                   Min="0"
+                                   Class="mt-3" />
+
+                    <MudNumericField @bind-Value="Community.ActualBrothers"
+                                   Label="@Localizer["ActualBrothers"]"
+                                   Required="true"
+                                   Min="0"
+                                   Class="mt-3" />
+
+                    <MudSelect @bind-Value="@(Community.StepWayId)"
+                             Label="@Localizer["StepWay"]"
+                             Required="true"
+                             Class="mt-3"
+                             AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var step in StepWayOptions)
+                        {
+                            <MudSelectItem Value="@step.Id">@Localizer[step.Name]</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudDatePicker @bind-Date="Community.StepWayDate"
+                                 Label="@Localizer["StepWayDate"]"
+                                 Class="mt-3" />
+
+                    <MudTextField @bind-Value="Community.OldCatechist"
+                                Label="@Localizer["OldCatechist"]"
+                                Class="mt-3" />
+
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit"
+                              Color="Color.Primary"
+                              Variant="Variant.Filled"
+                              Class="mr-3">@Localizer[$"{ButtonText}"]</MudButton>
+                    <MudButton OnClick="OnCancel"
+                              Color="Color.Secondary"
+                              Variant="Variant.Filled">@Localizer["Cancel"]</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    [Parameter] public CommunityDto Community { get; set; } = new();
+    [Parameter] public string ButtonText { get; set; } = "Save";
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private List<ParishDto> Parishes { get; set; } = new();
+    private List<StepWayOption> StepWayOptions { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadParishes();
+        InitializeStepWayOptions();
+    }
+
+    private async Task LoadParishes()
+    {
+        Parishes = await ParishService.GetParishesAsync();
+    }
+
+    private void InitializeStepWayOptions()
+    {
+        StepWayOptions = new List<StepWayOption>
+        {
+            new("primer-escrutinio", "FirstScrutiny"),
+            new("shema", "Shema"),
+            new("segundo-escrutinio", "SecondScrutiny")
+        };
+    }
+
+    private record StepWayOption(string Id, string Name);
+} 

@@ -1,0 +1,98 @@
+@page "/communities"
+@using CaminoManager.Web.Services
+@using Microsoft.Extensions.Localization
+@using CaminoManager.ServiceDefaults.DTOs
+@inject CommunityService CommunityService
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject IStringLocalizer<Shared> Localizer
+
+<PageTitle>@Localizer["Communities"]</PageTitle>
+
+<MudText Typo="Typo.h3" Class="mb-4">@Localizer["Communities"]</MudText>
+
+<MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Filled" 
+           OnClick="@(() => NavigationManager.NavigateTo("/communities/create"))" Class="mb-4">
+    @Localizer["NewCommunity"]
+</MudButton>
+
+@if (_communities == null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudDataGrid Items="_communities" T="CommunityDto" Dense="true" Hover="true" Bordered="true" Striped="true" 
+                 QuickFilter="@_quickFilter" FilterMode="@DataGridFilterMode.Simple">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">@Localizer["Communities"]</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="@Localizer["Search"]" Adornment="Adornment.Start"
+                         Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" 
+                         Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Number" Title="@Localizer["Number"]" />
+            <PropertyColumn Property="x => x.BornDate" Title="@Localizer["BornDate"]">
+                <CellTemplate>
+                    @context.Item.BornDate.ToShortDateString()
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.BornBrothers" Title="@Localizer["BornBrothers"]" />
+            <PropertyColumn Property="x => x.ActualBrothers" Title="@Localizer["ActualBrothers"]" />
+            <PropertyColumn Property="x => x.StepWayDate" Title="@Localizer["StepWayDate"]">
+                <CellTemplate>
+                    @(context.Item.StepWayDate?.ToShortDateString() ?? "-")
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.OldCatechist" Title="@Localizer["OldCatechist"]" />
+
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" 
+                                  OnClick="@(() => NavigationManager.NavigateTo($"/communities/edit/{context.Item.Id}"))" />
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" 
+                                  OnClick="@(async e => await DeleteCommunity(context.Item))" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="CommunityDto" />
+        </PagerContent>
+    </MudDataGrid>
+}
+
+@code {
+    private List<CommunityDto>? _communities;
+    private string _searchString;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var communities = await CommunityService.GetCommunitiesAsync();
+        _communities = communities.ToList();
+    }
+
+    private async Task DeleteCommunity(CommunityDto community)
+    {
+        var result = await DialogService.ShowMessageBox(
+            Localizer.GetString("DeleteCommunity"),
+            Localizer.GetString("DeleteCommunityMessage"),
+            yesText: Localizer.GetString("Delete"),
+            cancelText: Localizer.GetString("Cancel"));
+
+        if (result == true)
+        {
+            await CommunityService.DeleteCommunityAsync(community.Id);
+            var communities = await CommunityService.GetCommunitiesAsync();
+            _communities = communities.ToList();
+        }
+    }
+
+    private Func<CommunityDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        return false;
+    };
+} 

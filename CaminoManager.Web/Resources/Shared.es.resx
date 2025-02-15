@@ -309,4 +309,55 @@
   <data name="Remove" xml:space="preserve">
     <value>Eliminar</value>
   </data>
+  <data name="Communities" xml:space="preserve">
+      <value>Comunidades</value>
+  </data>
+  <data name="NewCommunity" xml:space="preserve">
+      <value>Nueva Comunidad</value>
+  </data>
+  <data name="DeleteCommunity" xml:space="preserve">
+      <value>Eliminar Comunidad</value>
+  </data>
+  <data name="DeleteCommunityMessage" xml:space="preserve">
+      <value>¿Está seguro que desea eliminar esta comunidad?</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+      <value>Descripción</value>
+  </data>
+  <data name="Number" xml:space="preserve">
+    <value>Número</value>
+  </data>
+  <data name="BornDate" xml:space="preserve">
+    <value>Fecha de Nacimiento</value>
+  </data>
+  <data name="SelectParish" xml:space="preserve">
+    <value>Seleccione una Parroquia</value>
+  </data>
+  <data name="BornBrothers" xml:space="preserve">
+    <value>Hermanos Iniciales</value>
+  </data>
+  <data name="ActualBrothers" xml:space="preserve">
+    <value>Hermanos Actuales</value>
+  </data>
+  <data name="StepWay" xml:space="preserve">
+    <value>Etapa del Camino</value>
+  </data>
+  <data name="StepWayDate" xml:space="preserve">
+    <value>Fecha de la Etapa</value>
+  </data>
+  <data name="OldCatechist" xml:space="preserve">
+    <value>Catequista Anterior</value>
+  </data>
+  <data name="FirstScrutiny" xml:space="preserve">
+    <value>Primer Escrutinio</value>
+  </data>
+  <data name="Shema" xml:space="preserve">
+    <value>Shemá</value>
+  </data>
+  <data name="SecondScrutiny" xml:space="preserve">
+    <value>Segundo Escrutinio</value>
+  </data>
+  <data name="EditCommunity" xml:space="preserve">
+    <value>Editar Comunidad</value>
+  </data>
 </root>

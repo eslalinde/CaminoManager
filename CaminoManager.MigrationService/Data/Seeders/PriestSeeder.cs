@@ -17,31 +17,44 @@ public static class PriestSeeder
             .Where(p => p.PersonTypeId == PersonType.Priest)
             .ToListAsync(cancellationToken);
 
+        // Check if we have any priests to assign
+        if (!priestPeople.Any())
+            return;
+
         var priests = new List<Priest>();
         var currentPriestIndex = 0;
 
         foreach (var parish in parishes)
         {
-            // Create parish priest (main priest)
-            priests.Add(new Priest
+            // Create parish priest (main priest) if we have enough priests
+            if (currentPriestIndex < priestPeople.Count)
             {
-                Id = Guid.NewGuid(),
-                PersonId = priestPeople[currentPriestIndex++].Id,
-                IsParishPriest = true,
-                Parish = parish
-            });
+                priests.Add(new Priest
+                {
+                    Id = Guid.NewGuid(),
+                    PersonId = priestPeople[currentPriestIndex++].Id,
+                    IsParishPriest = true,
+                    Parish = parish
+                });
 
-            // Create assistant priest
-            priests.Add(new Priest
-            {
-                Id = Guid.NewGuid(),
-                PersonId = priestPeople[currentPriestIndex++].Id,
-                IsParishPriest = false,
-                Parish = parish
-            });
+                // Create assistant priest if we have enough priests
+                if (currentPriestIndex < priestPeople.Count)
+                {
+                    priests.Add(new Priest
+                    {
+                        Id = Guid.NewGuid(),
+                        PersonId = priestPeople[currentPriestIndex++].Id,
+                        IsParishPriest = false,
+                        Parish = parish
+                    });
+                }
+            }
         }
 
-        await dbContext.Priests.AddRangeAsync(priests, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        if (priests.Any())
+        {
+            await dbContext.Priests.AddRangeAsync(priests, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
     }
 }
